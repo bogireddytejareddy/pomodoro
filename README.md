@@ -1,6 +1,6 @@
 # Pomodoro
 
-A static, database-free focus timer with 30-minute, 1-hour, and 3-hour presets.
+A minimal, database-free focus timer with 30-minute, 1-hour, and 3-hour presets. The interface uses lightweight typography and an original sumi-e-inspired SVG landscape.
 
 ## Run locally
 
