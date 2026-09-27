@@ -31,10 +31,19 @@
             <time id="timeDisplay" datetime="PT30M">30:00</time>
           </div>
         </div>
-        <div class="presets" role="radiogroup" aria-label="Focus duration">
-          <button class="active" type="button" role="radio" aria-checked="true" data-minutes="30">30m</button>
-          <button type="button" role="radio" aria-checked="false" data-minutes="60">1h</button>
-          <button type="button" role="radio" aria-checked="false" data-minutes="180">3h</button>
+        <div class="mode-switch" role="tablist" aria-label="Timer mode">
+          <button class="active" type="button" role="tab" aria-selected="true" data-mode="focus">focus</button>
+          <i></i>
+          <button type="button" role="tab" aria-selected="false" data-mode="break">break</button>
+        </div>
+        <div class="presets" id="focusPresets" role="radiogroup" aria-label="Focus duration">
+          <button class="active" type="button" role="radio" aria-checked="true" data-mode="focus" data-minutes="30">30m</button>
+          <button type="button" role="radio" aria-checked="false" data-mode="focus" data-minutes="60">1h</button>
+          <button type="button" role="radio" aria-checked="false" data-mode="focus" data-minutes="180">3h</button>
+        </div>
+        <div class="presets" id="breakPresets" role="radiogroup" aria-label="Break duration" hidden>
+          <button class="active" type="button" role="radio" aria-checked="true" data-mode="break" data-minutes="5">5m</button>
+          <button type="button" role="radio" aria-checked="false" data-mode="break" data-minutes="15">15m</button>
         </div>
         <div class="actions">
           <button class="reset" id="resetButton" type="button">reset</button>

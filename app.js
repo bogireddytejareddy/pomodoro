@@ -1,4 +1,4 @@
-const DURATIONS = [30, 60, 180];
+const DURATIONS = { focus: [30, 60, 180], break: [5, 15] };
 const RADIUS = 145;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const STORAGE_KEY = "pomodoro-minimal-v1";
@@ -8,6 +8,8 @@ const elements = {
   time: document.querySelector("#timeDisplay"), status: document.querySelector("#timerStatus"),
   start: document.querySelector("#startButton"), startText: document.querySelector("#startText"),
   reset: document.querySelector("#resetButton"), sound: document.querySelector("#soundButton"),
+  modeButtons: [...document.querySelectorAll(".mode-switch button")],
+  presetGroups: [...document.querySelectorAll(".presets")],
   presets: [...document.querySelectorAll(".presets button")],
 };
 
@@ -16,7 +18,10 @@ const readPreferences = () => {
   catch { return {}; }
 };
 const preferences = readPreferences();
-let minutes = DURATIONS.includes(preferences.minutes) ? preferences.minutes : 30;
+let mode = preferences.mode === "break" ? "break" : "focus";
+let focusMinutes = DURATIONS.focus.includes(preferences.focusMinutes) ? preferences.focusMinutes : 30;
+let breakMinutes = DURATIONS.break.includes(preferences.breakMinutes) ? preferences.breakMinutes : 5;
+let minutes = mode === "focus" ? focusMinutes : breakMinutes;
 let soundEnabled = preferences.sound !== false;
 let totalSeconds = minutes * 60;
 let remainingSeconds = totalSeconds;
@@ -26,7 +31,7 @@ let intervalId;
 let audioContext;
 
 const save = () => {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ minutes, sound: soundEnabled })); }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode, focusMinutes, breakMinutes, sound: soundEnabled })); }
   catch { /* Persistence is optional. */ }
 };
 const formatTime = (value) => {
@@ -108,9 +113,11 @@ const reset = () => {
 };
 const selectDuration = (nextMinutes) => {
   minutes = nextMinutes;
+  if (mode === "focus") focusMinutes = minutes;
+  else breakMinutes = minutes;
   totalSeconds = minutes * 60;
   elements.presets.forEach((button) => {
-    const active = Number(button.dataset.minutes) === minutes;
+    const active = button.dataset.mode === mode && Number(button.dataset.minutes) === minutes;
     button.classList.toggle("active", active);
     button.setAttribute("aria-checked", String(active));
   });
@@ -118,10 +125,24 @@ const selectDuration = (nextMinutes) => {
   reset();
 };
 
+const selectMode = (nextMode) => {
+  mode = nextMode;
+  elements.modeButtons.forEach((button) => {
+    const active = button.dataset.mode === mode;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+  });
+  elements.presetGroups.forEach((group) => {
+    group.hidden = group.id !== `${mode}Presets`;
+  });
+  selectDuration(mode === "focus" ? focusMinutes : breakMinutes);
+};
+
 elements.progress.style.strokeDasharray = String(CIRCUMFERENCE);
 elements.start.addEventListener("click", toggle);
 elements.reset.addEventListener("click", reset);
 elements.presets.forEach((button) => button.addEventListener("click", () => selectDuration(Number(button.dataset.minutes))));
+elements.modeButtons.forEach((button) => button.addEventListener("click", () => selectMode(button.dataset.mode)));
 elements.sound.addEventListener("click", () => {
   soundEnabled = !soundEnabled;
   elements.sound.setAttribute("aria-pressed", String(soundEnabled));
@@ -132,9 +153,9 @@ document.addEventListener("keydown", (event) => {
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   if (event.code === "Space") { event.preventDefault(); toggle(); }
   else if (event.key.toLowerCase() === "r") reset();
-  else if (["1","2","3"].includes(event.key)) selectDuration(DURATIONS[Number(event.key) - 1]);
+  else if (["1","2","3"].includes(event.key) && mode === "focus") selectDuration(DURATIONS.focus[Number(event.key) - 1]);
 });
 document.addEventListener("visibilitychange", () => { if (running && !document.hidden) tick(); });
 
 elements.sound.setAttribute("aria-pressed", String(soundEnabled));
-selectDuration(minutes);
+selectMode(mode);

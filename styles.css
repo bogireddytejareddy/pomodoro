@@ -11,6 +11,7 @@
 * { box-sizing: border-box; }
 html { min-width: 320px; background: var(--paper); }
 body {
+  position: relative;
   min-height: 100vh;
   margin: 0;
   overflow: hidden;
@@ -20,8 +21,8 @@ body {
 button { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button:focus-visible, a:focus-visible { outline: 1px solid var(--red); outline-offset: 5px; }
-.painting { position: fixed; z-index: -1; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; user-select: none; }
-main { display: flex; width: min(1120px, calc(100% - 48px)); min-height: 100vh; margin: auto; flex-direction: column; }
+.painting { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .75; pointer-events: none; user-select: none; }
+main { position: relative; z-index: 1; display: flex; width: min(1120px, calc(100% - 48px)); min-height: 100vh; margin: auto; flex-direction: column; }
 header { display: flex; height: 84px; align-items: center; justify-content: space-between; }
 .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-size: 13px; font-weight: 300; letter-spacing: .12em; text-decoration: none; }
 .brand i { width: 9px; height: 9px; border-radius: 50%; background: var(--red); }
@@ -41,7 +42,12 @@ header { display: flex; height: 84px; align-items: center; justify-content: spac
 .running .status-dot { background: var(--red); box-shadow: 0 0 0 5px rgba(183,71,50,.09); animation: breathe 2.2s ease-in-out infinite; }
 #timeDisplay { color: var(--ink); font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: clamp(66px, 8vw, 94px); font-weight: 200; letter-spacing: -.07em; line-height: 1; font-variant-numeric: tabular-nums; }
 #timeDisplay.long { font-size: clamp(48px, 6vw, 72px); }
-.presets { display: flex; margin-top: 27px; gap: 35px; }
+.mode-switch { display: flex; margin-top: 22px; align-items: center; gap: 13px; }
+.mode-switch i { width: 2px; height: 2px; border-radius: 50%; background: var(--soft-ink); }
+.mode-switch button { padding: 3px; border: 0; background: transparent; color: rgba(41,42,39,.34); font-size: 10px; font-weight: 300; letter-spacing: .13em; cursor: pointer; }
+.mode-switch button.active { color: var(--ink); }
+.presets { display: flex; margin-top: 10px; gap: 35px; }
+.presets[hidden] { display: none; }
 .presets button { position: relative; padding: 8px 2px; border: 0; background: transparent; color: rgba(41,42,39,.4); font-size: 12px; font-weight: 300; letter-spacing: .08em; cursor: pointer; transition: color .2s; }
 .presets button::after { position: absolute; right: 0; bottom: 1px; left: 0; height: 1px; background: var(--red); content: ""; opacity: 0; transform: scaleX(.2); transition: opacity .2s, transform .2s; }
 .presets button:hover, .presets button.active { color: var(--ink); }
