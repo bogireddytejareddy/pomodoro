@@ -7,7 +7,7 @@ const elements = {
   timer: document.querySelector(".timer"), progress: document.querySelector("#progressCircle"),
   time: document.querySelector("#timeDisplay"), status: document.querySelector("#timerStatus"),
   start: document.querySelector("#startButton"), startText: document.querySelector("#startText"),
-  reset: document.querySelector("#resetButton"), sound: document.querySelector("#soundButton"),
+  reset: document.querySelector("#resetButton"),
   modeButtons: [...document.querySelectorAll(".mode-switch button")],
   presetGroups: [...document.querySelectorAll(".presets")],
   presets: [...document.querySelectorAll(".presets button")],
@@ -22,16 +22,14 @@ let mode = preferences.mode === "break" ? "break" : "focus";
 let focusMinutes = DURATIONS.focus.includes(preferences.focusMinutes) ? preferences.focusMinutes : 30;
 let breakMinutes = DURATIONS.break.includes(preferences.breakMinutes) ? preferences.breakMinutes : 5;
 let minutes = mode === "focus" ? focusMinutes : breakMinutes;
-let soundEnabled = preferences.sound !== false;
 let totalSeconds = minutes * 60;
 let remainingSeconds = totalSeconds;
 let running = false;
 let endTime = 0;
 let intervalId;
-let audioContext;
 
 const save = () => {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode, focusMinutes, breakMinutes, sound: soundEnabled })); }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ mode, focusMinutes, breakMinutes })); }
   catch { /* Persistence is optional. */ }
 };
 const formatTime = (value) => {
@@ -40,29 +38,6 @@ const formatTime = (value) => {
   const mins = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
   return hours ? `${String(hours).padStart(2,"0")}:${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}` : `${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
-};
-const prepareAudio = () => {
-  if (!soundEnabled) return;
-  const AudioContext = window.AudioContext || window.webkitAudioContext;
-  if (!AudioContext) return;
-  audioContext ||= new AudioContext();
-  if (audioContext.state === "suspended") audioContext.resume();
-};
-const chime = () => {
-  prepareAudio();
-  if (!audioContext) return;
-  [523.25, 659.25, 783.99].forEach((frequency, index) => {
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    const start = audioContext.currentTime + index * .17;
-    oscillator.frequency.value = frequency;
-    gain.gain.setValueAtTime(.001, start);
-    gain.gain.exponentialRampToValueAtTime(.1, start + .02);
-    gain.gain.exponentialRampToValueAtTime(.001, start + .7);
-    oscillator.connect(gain).connect(audioContext.destination);
-    oscillator.start(start);
-    oscillator.stop(start + .72);
-  });
 };
 const render = () => {
   const value = formatTime(remainingSeconds);
@@ -83,7 +58,6 @@ const finish = () => {
   elements.startText.textContent = "again";
   elements.status.textContent = "Session complete";
   document.title = "Done · Pomodoro";
-  chime();
 };
 const tick = () => {
   remainingSeconds = Math.max(0, (endTime - Date.now()) / 1000);
@@ -97,7 +71,6 @@ const toggle = () => {
     clearInterval(intervalId);
   } else {
     if (remainingSeconds <= 0) remainingSeconds = totalSeconds;
-    prepareAudio();
     running = true;
     endTime = Date.now() + remainingSeconds * 1000;
     clearInterval(intervalId);
@@ -143,12 +116,6 @@ elements.start.addEventListener("click", toggle);
 elements.reset.addEventListener("click", reset);
 elements.presets.forEach((button) => button.addEventListener("click", () => selectDuration(Number(button.dataset.minutes))));
 elements.modeButtons.forEach((button) => button.addEventListener("click", () => selectMode(button.dataset.mode)));
-elements.sound.addEventListener("click", () => {
-  soundEnabled = !soundEnabled;
-  elements.sound.setAttribute("aria-pressed", String(soundEnabled));
-  elements.sound.setAttribute("aria-label", soundEnabled ? "Mute sound" : "Turn sound on");
-  save();
-});
 document.addEventListener("keydown", (event) => {
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   if (event.code === "Space") { event.preventDefault(); toggle(); }
@@ -157,5 +124,4 @@ document.addEventListener("keydown", (event) => {
 });
 document.addEventListener("visibilitychange", () => { if (running && !document.hidden) tick(); });
 
-elements.sound.setAttribute("aria-pressed", String(soundEnabled));
 selectMode(mode);
