@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111411" />
+    <meta name="description" content="A calm, beautifully simple Pomodoro timer." />
+    <title>Pomodoro — Make time count</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="glow glow-left" aria-hidden="true"></div>
+    <div class="glow glow-right" aria-hidden="true"></div>
+
+    <main class="shell">
+      <header>
+        <a class="brand" href="./" aria-label="Pomodoro home">
+          <span class="brand-mark"><i></i></span>
+          pomodoro
+        </a>
+        <div class="header-actions">
+          <span class="local"><i></i> saved locally</span>
+          <button class="icon-button" id="soundButton" type="button" aria-label="Mute sound" aria-pressed="true">
+            <svg class="sound-on" viewBox="0 0 24 24"><path d="M11 5 7 8.5H3v7h4l4 3.5V5Zm4.5 3.2a5.4 5.4 0 0 1 0 7.6M18 5.5a9 9 0 0 1 0 13" /></svg>
+            <svg class="sound-off" viewBox="0 0 24 24"><path d="M11 5 7 8.5H3v7h4l4 3.5V5Zm4 5 5 5m0-5-5 5" /></svg>
+          </button>
+          <button class="icon-button" id="themeButton" type="button" aria-label="Switch theme">
+            <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+            <svg class="moon" viewBox="0 0 24 24"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="intro">
+        <p class="eyebrow"><span></span>A quiet space to focus</p>
+        <h1>Make time <em>count.</em></h1>
+        <p>Choose a session, press start, and give one thing your full attention.</p>
+      </section>
+
+      <section class="workspace" aria-label="Pomodoro timer">
+        <div class="timer-panel">
+          <div class="panel-meta"><span id="sessionLabel">Focus session</span><span>Session <b id="sessionNumber">01</b></span></div>
+
+          <div class="clock">
+            <svg viewBox="0 0 400 400" aria-hidden="true">
+              <circle class="track" cx="200" cy="200" r="174" />
+              <circle class="progress" id="progressCircle" cx="200" cy="200" r="174" />
+            </svg>
+            <div class="clock-copy">
+              <span class="state" id="timerState">Ready when you are</span>
+              <time id="timeDisplay" datetime="PT30M">30:00</time>
+              <span class="caption" id="timerCaption">30 minute focus</span>
+            </div>
+          </div>
+
+          <div class="timer-actions">
+            <button class="start-button" id="startButton" type="button">
+              <svg class="play" viewBox="0 0 24 24"><path d="m9 6 8 6-8 6V6Z"/></svg>
+              <svg class="pause" viewBox="0 0 24 24"><path d="M8 6v12m8-12v12"/></svg>
+              <span id="startText">Start focus</span>
+            </button>
+            <button class="reset-button" id="resetButton" type="button">
+              <svg viewBox="0 0 24 24"><path d="M19.5 8A8 8 0 1 0 20 15m-.5-7V3m0 5h-5"/></svg>
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <aside class="controls">
+          <div>
+            <p class="section-label">Session length</p>
+            <h2>How long are we focusing?</h2>
+          </div>
+
+          <div class="presets" role="radiogroup" aria-label="Focus duration">
+            <button class="preset active" type="button" role="radio" aria-checked="true" data-minutes="30">
+              <i></i><span><strong>30 minutes</strong><small>A focused sprint</small></span><kbd>1</kbd>
+            </button>
+            <button class="preset" type="button" role="radio" aria-checked="false" data-minutes="60">
+              <i></i><span><strong>1 hour</strong><small>Deep work</small></span><kbd>2</kbd>
+            </button>
+            <button class="preset" type="button" role="radio" aria-checked="false" data-minutes="180">
+              <i></i><span><strong>3 hours</strong><small>Full immersion</small></span><kbd>3</kbd>
+            </button>
+          </div>
+
+          <div class="momentum">
+            <div><span><small>Today's momentum</small><strong id="dailyTime">0 min</strong></span><span><b id="sessionCount">0</b> sessions</span></div>
+            <div class="momentum-track"><i id="momentumProgress"></i></div>
+            <p>Small, deliberate blocks add up to meaningful work.</p>
+          </div>
+
+          <p class="shortcuts"><kbd>Space</kbd> start / pause <i></i> <kbd>R</kbd> reset</p>
+        </aside>
+      </section>
+
+      <footer><span>One task. One timer. No distractions.</span><span>Runs entirely in your browser.</span></footer>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>
